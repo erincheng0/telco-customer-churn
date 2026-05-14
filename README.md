@@ -16,6 +16,8 @@ In this project, I analyze Telco Customer Churn to understand how churn rates va
 
 This project uses the Telco Customer Churn dataset, which contains 7,043 customers of a subscription‑based telecom provider offering phone and internet services in California. Each row represents a single customer and their most recent status.
 
+Link to data: https://www.kaggle.com/datasets/blastchar/telco-customer-churn/data
+
 The dataset includes four main groups of features:
 
 - **Customer demographics**: gender, senior citizen flag, marital status, and whether the customer has dependents.  
