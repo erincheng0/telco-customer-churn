@@ -3,6 +3,7 @@ namespace: erin.telco
 
 tasks:
   - id: run_local_etl
+  # Run the local Python ETL that reads raw CSV and writes curated Parquet
     type: io.kestra.plugin.scripts.python.Commands
     taskRunner:
       type: io.kestra.plugin.core.runner.Process
@@ -11,6 +12,7 @@ tasks:
       - python /workspace/src/etl/etl_telco_churn.py
 
   - id: upload_fact_to_s3
+  # Publish curated fact table to the S3 curated zone for Athena/QuickSight
     type: io.kestra.plugin.aws.s3.Upload
     region: "us-west-2"
     accessKeyId: "AKIAZBYGZFT6VFH3FJGP"

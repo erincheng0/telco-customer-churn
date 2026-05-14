@@ -2,21 +2,22 @@ version: "3.9"
 
 services:
   kestra:
+    # Local Kestra instance to orchestrate the telco churn ETL pipeline
     image: kestra/kestra:latest
     container_name: kestra
     user: "root"
     restart: unless-stopped
     command: server standalone --config /app/config/application.yml
     ports:
-      - "8080:8080"
+      - "8080:8080" # Expose Kestra UI on localhost:8080
     volumes:
-      - kestra-data:/app/storage
-      - /var/run/docker.sock:/var/run/docker.sock
+      - kestra-data:/app/storage  # Persist Kestra state/logs
+      - /var/run/docker.sock:/var/run/docker.sock # Allow Kestra to manage Docker tasks
       - ./application.yml:/app/config/application.yml
       - ./flows:/app/flows
       - /Users/erincheng/Desktop/telco-customer-churn:/workspace
     env_file:
-      - .env
+      - .env # Local environment variables
     environment:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}

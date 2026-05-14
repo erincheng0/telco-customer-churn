@@ -1,8 +1,4 @@
-#paths:
- # raw_csv: "/Users/erincheng/Desktop/telco-customer-churn/data/raw/telco_customer_churn.csv"
- # curated_dir: "/Users/erincheng/Desktop/telco-customer-churn/data/curated"
 
-# repo version 
 paths:
   raw_csv: "/workspace/data/raw/telco_customer_churn.csv"
   curated_dir: "/workspace/data/curated"
