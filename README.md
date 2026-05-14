@@ -119,25 +119,142 @@ Includes:
 
 The **Telco Churn Analysis** dashboard summarizes overall churn and highlights how churn varies across key customer segments. It includes:
 
-- A headline tile with overall churn rate.  
-- Bar charts for churn rate by contract type, payment method, and internet service.  
-- Segment views combining internet service with streaming TV and streaming movies subscriptions.  
-- Demographic views for churn by gender and senior citizen status.  
+- A headline tile with overall churn rate  
+- Bar charts for churn rate by contract type, payment method, and internet service  
+- Segment views combining internet service with streaming TV and streaming movies subscriptions  
+- Demographic views for churn by gender and senior citizen status  
 
 ### Key insights
 
-**Overall churn is substantial**
-
+**Overall churn is substantial**  
 - The total churn rate is **26.58%**, indicating churn is a material business problem that deserves focused attention.
 
-**Contract type is a major driver**
-
+**Contract type is a major driver**  
 - Month‑to‑month customers churn at much higher rates than those on one‑ or two‑year contracts, suggesting that incentives to move customers onto longer‑term contracts could reduce churn.
 
-**Payment method is strongly associated with churn risk**
-
+**Payment method is strongly associated with churn risk**  
 - Customers paying by **electronic check** exhibit notably higher churn than those using automatic payments such as bank transfer or credit card, highlighting an opportunity to encourage lower‑churn payment methods.
 
-**Internet service type and streaming behavior matter**
+**Internet service type and streaming behavior matter**  
+- Churn varies by internet service type, with fiber‑optic customers showing elevated churn compared to DSL or customers without internet service.  
+- Heatmaps combining internet service with streaming TV/movies reveal particularly risky product bundles.
 
-- Churn varies by internet service type, with fiber‑optic customers showing elevated churn 
+**Demographics reveal vulnerable groups**  
+- Senior citizens churn at higher rates than non‑seniors, while gender has a smaller impact.  
+- This suggests that targeted retention programs for older customers could be effective.
+
+By breaking churn down by contract, payment, internet service, and demographics, the dashboard helps business users move from “overall churn is high” to “these specific customer segments are driving the problem.”
+
+---
+
+## 6. Tech stack and my role
+
+### Tech stack
+
+- **Cloud**: AWS S3 (data lake storage), AWS Glue Data Catalog (metadata), Amazon Athena (query engine)  
+- **Orchestration**: Kestra for scheduling, dependency management, and monitoring ETL runs  
+- **Processing & modeling**: Python (pandas, PyArrow, NumPy) for ETL and feature engineering, SQL for analytical queries and data modeling  
+- **BI**: Amazon QuickSight for dashboarding and business visualization  
+
+### My role
+
+I designed and implemented the project end‑to‑end:
+
+- Ingesting and modeling the dataset  
+- Building the AWS‑based data pipeline  
+- Developing the star‑schema data model  
+- Creating the QuickSight dashboard and business analysis  
+
+---
+
+## 7. Repository structure
+
+```text
+telco-customer-churn/
+├─ dashboard/                         # QuickSight assets (exports, screenshots, notes)
+├─ data/
+│  ├─ raw/                            # Original Kaggle CSV (immutable source)
+│  ├─ curated/                        # Local curated Parquet output from ETL
+│  └─ sample/                         # Small sample CSV for quick testing
+├─ infra/
+│  └─ terraform/                      # Terraform to provision S3, Glue, Athena resources
+├─ notebooks/
+│  └─ 01_exploration_customer_churn.ipynb  # Initial EDA and profiling
+├─ orchestration/
+│  ├─ flows/
+│  │  └─ main_erin.telco_telco_churn_pipeline.yml  # Kestra flow definition
+│  ├─ sql/                            # Athena SQL (DDL + analytical queries)
+│  │  ├─ create_database_telco_churn.sql
+│  │  ├─ dim_billing_contract.sql
+│  │  ├─ dim_customer_demographics.sql
+│  │  ├─ dim_customer_services.sql
+│  │  ├─ table_fact_customer_churn.sql
+│  │  └─ views.sql
+│  ├─ docker-compose.yml              # Local Kestra + dependencies
+│  ├─ application.yml                 # Kestra configuration
+│  ├─ .env.example                    # Example environment variables (no secrets)
+│  └─ .env                            # Local environment variables (gitignored)
+├─ src/
+│  ├─ config/
+│  │  └─ config.yml                   # Paths and S3 config for ETL
+│  └─ etl/
+│     └─ etl_telco_churn.py           # Python ETL script (cleaning, features, Parquet)
+└─ README.md
+```
+
+---
+
+## 8. How to run locally
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/<your-username>/telco-customer-churn.git
+   cd telco-customer-churn
+   ```
+
+2. **Set up environment variables**
+
+   ```bash
+   cp orchestration/.env.example orchestration/.env
+   ```
+
+3. **Provision AWS infrastructure with Terraform**
+
+   ```bash
+   cd infra/terraform
+   terraform init
+   terraform plan
+   terraform apply
+   ```
+
+4. **Start Kestra locally with Docker Compose**
+
+   ```bash
+   cd orchestration
+   docker compose up -d
+   ```
+
+5. **Open Kestra UI**
+
+   - Visit: `http://localhost:8080`
+
+6. **Manually upload the raw Kaggle CSV**
+
+   ```bash
+   aws s3 cp data/raw/telco_customer_churn.csv \
+     s3://telco-churn-project-dev/raw/telco_customer_churn.csv
+   ```
+
+7. **Trigger the ETL pipeline**
+
+   In the Kestra UI:
+
+   - Navigate to **Flows → erin.telco namespace → telco_churn_pipeline**  
+   - Click **Execute** to trigger the flow manually  
+
+   The pipeline will:
+
+   - Run the Python ETL script (`src/etl/etl_telco_churn.py`) to clean, transform, and build `fact_customer_churn`  
+   - Write the curated Parquet file locally to `data/curated/fact_customer_churn.parquet`  
+   - Upload it to `s3://telco-churn-project-dev/curated/telco_churn/fact_customer_churn.parquet`
