@@ -1,13 +1,19 @@
-
+# Local filesystem paths used by the ETL script
 paths:
+  # immutable raw CSV
   raw_csv: "/workspace/data/raw/telco_customer_churn.csv"
+  # Directory where the ETL writes curated Parquet outputs
   curated_dir: "/workspace/data/curated"
 
+# S3 location for publishing curated fact table
 s3:
   bucket: "telco-churn-project-dev"
+  # Key for the main churn fact table Parquet file
   key: "curated/telco_churn/fact_customer_churn.parquet"
 
-
+# Athena metadata used by downstream SQL/BI
 athena:
+  # Glue/Athena database with telco churn tables
   database: "telco_churn_db"
+  # Fact table name exposed to Athena/QuickSight
   fact_table: "fact_customer_churn"

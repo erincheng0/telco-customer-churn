@@ -6,15 +6,18 @@ kestra:
       username: ${KESTRA_USERNAME}
       password: ${KESTRA_PASSWORD}
 
+  # Disable telemetry for local development
   anonymous-usage-report:
     enabled: false
 
+  # Local embedded metadata store and queue for a simple single-node setup
   repository:
     type: h2
 
   queue:
     type: h2
 
+  # Persist Kestra files, logs, and internal state on the mounted volume
   storage:
     type: local
     local:
@@ -22,10 +25,12 @@ kestra:
 
   tasks:
     tmp-dir:
+      # Working directory used by task execution
       path: /tmp/kestra-wd/tmp
   
 
   datasource:
+    # H2 database used by standalone Kestra in local development
     url: jdbc:h2:/app/storage/h2.db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     username: kestra
     password: ""
@@ -33,16 +38,19 @@ kestra:
 
   plugins:
     configs:
+      # Default AWS credentials/region for S3 upload tasks
       - type: io.kestra.plugin.aws.s3.Upload
         values:
           accessKeyId: "{{ envs.AWS_ACCESS_KEY_ID }}"
           secretKeyId: "{{ envs.AWS_SECRET_ACCESS_KEY }}"
           region: "{{ envs.AWS_DEFAULT_REGION }}"
+      # Default AWS credentials/region for S3 download tasks
       - type: io.kestra.plugin.aws.s3.Download
         values:
           accessKeyId: "{{ envs.AWS_ACCESS_KEY_ID }}"
           secretKeyId: "{{ envs.AWS_SECRET_ACCESS_KEY }}"
           region: "{{ envs.AWS_DEFAULT_REGION }}"
+      # Default AWS config for Athena query tasks
       - type: io.kestra.plugin.aws.athena.Query
         values:
           accessKeyId: "{{ envs.AWS_ACCESS_KEY_ID }}"
