@@ -1,0 +1,2 @@
+
+CREATE DATABASE IF NOT EXISTS telco_churn_db;

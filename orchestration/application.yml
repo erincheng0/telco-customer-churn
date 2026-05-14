@@ -1,0 +1,58 @@
+kestra:
+  server:
+    type: "standalone"
+    basic-auth:
+      enabled: true
+      username: ${KESTRA_USERNAME}
+      password: ${KESTRA_PASSWORD}
+
+  anonymous-usage-report:
+    enabled: false
+
+  repository:
+    type: h2
+
+  queue:
+    type: h2
+
+  storage:
+    type: local
+    local:
+      base-path: "/app/storage"
+
+  tasks:
+    tmp-dir:
+      path: /tmp/kestra-wd/tmp
+  
+
+  datasource:
+    url: jdbc:h2:/app/storage/h2.db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: kestra
+    password: ""
+    driverClassName: org.h2.Driver
+
+  plugins:
+    configs:
+      - type: io.kestra.plugin.aws.s3.Upload
+        values:
+          accessKeyId: "{{ envs.AWS_ACCESS_KEY_ID }}"
+          secretKeyId: "{{ envs.AWS_SECRET_ACCESS_KEY }}"
+          region: "{{ envs.AWS_DEFAULT_REGION }}"
+      - type: io.kestra.plugin.aws.s3.Download
+        values:
+          accessKeyId: "{{ envs.AWS_ACCESS_KEY_ID }}"
+          secretKeyId: "{{ envs.AWS_SECRET_ACCESS_KEY }}"
+          region: "{{ envs.AWS_DEFAULT_REGION }}"
+      - type: io.kestra.plugin.aws.athena.Query
+        values:
+          accessKeyId: "{{ envs.AWS_ACCESS_KEY_ID }}"
+          secretKeyId: "{{ envs.AWS_SECRET_ACCESS_KEY }}"
+          region: "{{ envs.AWS_DEFAULT_REGION }}"
+          outputLocation: "{{ envs.ATHENA_OUTPUT_LOCATION }}"
+
+micronaut:
+  io:
+    watch:
+      enabled: true
+      paths:
+        - /app/flows

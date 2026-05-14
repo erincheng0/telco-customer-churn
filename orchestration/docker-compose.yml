@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  kestra:
+    image: kestra/kestra:latest
+    container_name: kestra
+    user: "root"
+    restart: unless-stopped
+    command: server standalone --config /app/config/application.yml
+    ports:
+      - "8080:8080"
+    volumes:
+      - kestra-data:/app/storage
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./application.yml:/app/config/application.yml
+      - ./flows:/app/flows
+      - /Users/erincheng/Desktop/telco-customer-churn:/workspace
+    env_file:
+      - .env
+    environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION}
+      S3_BUCKET: ${S3_BUCKET}
+      ATHENA_OUTPUT_LOCATION: ${ATHENA_OUTPUT_LOCATION}
+      KESTRA_USERNAME: ${KESTRA_USERNAME}
+      KESTRA_PASSWORD: ${KESTRA_PASSWORD}
+
+volumes:
+  kestra-data:

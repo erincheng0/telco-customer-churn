@@ -1,0 +1,20 @@
+id: telco_churn_pipeline
+namespace: erin.telco
+
+tasks:
+  - id: run_local_etl
+    type: io.kestra.plugin.scripts.python.Commands
+    taskRunner:
+      type: io.kestra.plugin.core.runner.Process
+    commands:
+      - pip install pyyaml pandas pyarrow boto3
+      - python /workspace/src/etl/etl_telco_churn.py
+
+  - id: upload_fact_to_s3
+    type: io.kestra.plugin.aws.s3.Upload
+    region: "us-west-2"
+    accessKeyId: "AKIAZBYGZFT6VFH3FJGP"
+    secretKeyId: "Q4Z7LdfEpOO5cVYqrpNq350+6K72emc4ZIX2LMvy"
+    bucket: "telco-churn-project-dev"
+    from: "/workspace/data/curated/fact_customer_churn.parquet"
+    key: "curated/telco_churn/fact_customer_churn.parquet"

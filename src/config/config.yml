@@ -1,0 +1,17 @@
+#paths:
+ # raw_csv: "/Users/erincheng/Desktop/telco-customer-churn/data/raw/telco_customer_churn.csv"
+ # curated_dir: "/Users/erincheng/Desktop/telco-customer-churn/data/curated"
+
+# repo version 
+paths:
+  raw_csv: "/workspace/data/raw/telco_customer_churn.csv"
+  curated_dir: "/workspace/data/curated"
+
+s3:
+  bucket: "telco-churn-project-dev"
+  key: "curated/telco_churn/fact_customer_churn.parquet"
+
+
+athena:
+  database: "telco_churn_db"
+  fact_table: "fact_customer_churn"
